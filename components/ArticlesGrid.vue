@@ -84,7 +84,8 @@ const showNextPages = () => {
 const showPreviousPages = () => {
   if (hasPreviousPages.value) {
     startPage.value = Math.max(1, startPage.value - pagesPerGroup)
-    goToPage(startPage.value)
+    currentPage.value = startPage.value + pagesPerGroup - 1
+    goToPage(currentPage.value)
   }
 }
 
@@ -96,7 +97,6 @@ onMounted(() => {
   fetchArticles()
 })
 
-// Reset pagination when totalPages changes
 watch(totalPages, () => {
   startPage.value = 1
 })
