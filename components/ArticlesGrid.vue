@@ -76,15 +76,16 @@ const hasPreviousPages = computed(() => {
 
 const showNextPages = () => {
   if (hasNextPages.value) {
-    startPage.value += pagesPerGroup
-    goToPage(startPage.value)
+    startPage.value += 1
+    currentPage.value += 1
+    goToPage(currentPage.value)
   }
 }
 
 const showPreviousPages = () => {
   if (hasPreviousPages.value) {
-    startPage.value = Math.max(1, startPage.value - pagesPerGroup)
-    currentPage.value = startPage.value + pagesPerGroup - 1
+    currentPage.value -= 1
+    startPage.value -= 1
     goToPage(currentPage.value)
   }
 }
