@@ -7,7 +7,7 @@
     <template v-else>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <ArticleCard
-          v-for="article in articles"
+          v-for="article in paginatedArticles"
           :key="article.id"
           :article="article"
           @click="handleArticleClick(article)"
@@ -53,8 +53,21 @@
 <script setup lang="ts">
 import type { Article } from '@/types/article'
 
-const { articles, isLoading, error, currentPage, totalPages, fetchArticles, goToPage } =
-  useArticles()
+const {
+  data: articles,
+  pending: isLoading,
+  error,
+} = useFetch('https://6082e3545dbd2c001757abf5.mockapi.io/qtim-test-work/posts/')
+
+const currentPage = ref(1)
+const itemsPerPage = 8
+const totalPages = computed(() => Math.ceil(articles.value.length / itemsPerPage))
+
+const paginatedArticles = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  return articles.value.slice(start, start + itemsPerPage)
+})
+
 const pagesPerGroup = 5
 const startPage = ref(1)
 
@@ -77,28 +90,29 @@ const hasPreviousPages = computed(() => {
 const showNextPages = () => {
   if (hasNextPages.value) {
     startPage.value += 1
-    currentPage.value += 1
+    currentPage.value = Math.min(currentPage.value + 1, totalPages.value)
     goToPage(currentPage.value)
   }
 }
 
 const showPreviousPages = () => {
   if (hasPreviousPages.value) {
-    currentPage.value -= 1
     startPage.value -= 1
+    currentPage.value = Math.max(currentPage.value - 1, 1)
     goToPage(currentPage.value)
+  }
+}
+
+const goToPage = (page: number) => {
+  currentPage.value = page
+  if (page > startPage.value + pagesPerGroup - 1) {
+    startPage.value = page
+  } else if (page < startPage.value) {
+    startPage.value = Math.max(page - pagesPerGroup + 1, 1)
   }
 }
 
 const handleArticleClick = (article: Article) => {
   navigateTo(`/articles/${article.id}`)
 }
-
-onMounted(() => {
-  fetchArticles()
-})
-
-watch(totalPages, () => {
-  startPage.value = 1
-})
 </script>

@@ -1,17 +1,16 @@
 <script setup>
-const { currentArticle, isLoading, error, fetchArticleById } = useArticles()
-const router = useRouter()
+import { useRouter, useRoute } from 'vue-router'
 
 const route = useRoute()
 const articleId = route.params.id
 
+const { data: currentArticle, pending: isLoading, error } = useFetch(`https://6082e3545dbd2c001757abf5.mockapi.io/qtim-test-work/posts/${articleId}`)
+
+const router = useRouter()
+
 const goBack = () => {
   router.back()
 }
-
-onMounted(async () => {
-  await fetchArticleById(articleId)
-})
 </script>
 
 <template>
