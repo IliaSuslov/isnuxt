@@ -1,10 +1,15 @@
-<script setup>
+<script setup lang="ts">
+import type { Article } from '@/types/article'
 import { useRouter, useRoute } from 'vue-router'
 
 const route = useRoute()
 const articleId = route.params.id
 
-const { data: currentArticle, pending: isLoading, error } = useFetch(`https://6082e3545dbd2c001757abf5.mockapi.io/qtim-test-work/posts/${articleId}`)
+const {
+  data: article,
+  status,
+  error,
+} = await useFetch<Article, string | null>(`https://6082e3545dbd2c001757abf5.mockapi.io/qtim-test-work/posts/${articleId}`)
 
 const router = useRouter()
 
@@ -14,41 +19,44 @@ const goBack = () => {
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto px-4 py-12">
-    <div v-if="isLoading" class="flex justify-center items-center min-h-[400px]">
-      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+  <div class="max-w-5xl px-4 py-12 mx-auto">
+    <div v-if="status === 'pending'" class="flex justify-center items-center min-h-[400px]">
+      <div class="w-12 h-12 border-t-2 border-b-2 border-gray-900 rounded-full animate-spin" />
     </div>
-    <div v-else-if="error" class="text-red-500 text-center">{{ error }}</div>
-    <article v-else-if="currentArticle" class="article-detail space-y-8">
+    <div v-else-if="error" class="text-center text-red-500">{{ error }}</div>
+    <article v-else-if="article" class="space-y-8 article-detail">
       <h1 class="text-[84px]">
-        {{ currentArticle.title }}
+        {{ article.title }}
       </h1>
 
-      <div class="aspect-video w-full overflow-hidden rounded-lg">
-        <img 
-          :src="currentArticle.imageUrl" 
-          :alt="currentArticle.title"
-          class="w-full h-full object-cover"
+      <div class="w-full overflow-hidden rounded-lg aspect-video">
+        <img
+          :src="article.imageUrl"
+          :alt="article.title"
+          class="object-cover w-full h-full"
         >
       </div>
 
       <div class="max-w-2xl">
-        <p class="text-lg text-gray-700 leading-relaxed">
-          {{ currentArticle.description }}
+        <p class="text-lg leading-relaxed text-gray-700">
+          {{ article.description }}
         </p>
         <div class="mt-6 text-sm text-gray-500">
-          Published on {{ new Date(currentArticle.publishedAt).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          }) }}
+          Published on
+          {{
+            new Date(article.publishedAt as Date).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })
+          }}
         </div>
       </div>
-      
+
       <div class="mt-12">
-        <button 
+        <button
+          class="inline-flex items-center text-gray-600 transition-colors hover:text-gray-900"
           @click="goBack"
-          class="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
         >
           <span class="mr-2">←</span>
           Back to articles
@@ -74,4 +82,3 @@ const goBack = () => {
   }
 }
 </style>
-  
