@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-type ButtonVariant = 'primary' | 'secondary' | 'outline'
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'pagination' | 'footer'
 type ButtonSize = 'sm' | 'md' | 'lg'
 
 interface Props {

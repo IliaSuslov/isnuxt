@@ -8,5 +8,8 @@ export default defineNuxtConfig({
   ],
   css: ['~/assets/css/tailwind.css'],
   eslint: {},
-  tailwindcss: {}
+  tailwindcss: {},
+  typescript: {
+    typeCheck: true
+  }
 })
